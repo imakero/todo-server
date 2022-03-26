@@ -1,5 +1,10 @@
 const request = require("supertest")
 const app = require("../app")
+const {
+  connectDatabase,
+  clearDatabase,
+  dropDatabase,
+} = require("../lib/database")
 
 const validUser = {
   username: "cartman",
@@ -11,6 +16,18 @@ const postUser = (user = validUser, options = {}) => {
   const agent = request(app).post("/api/1.0/users")
   return agent.send(user)
 }
+
+beforeAll(async () => {
+  await connectDatabase()
+})
+
+beforeEach(async () => {
+  await clearDatabase()
+})
+
+afterAll(async () => {
+  await dropDatabase()
+})
 
 describe("User registration", () => {
   it("Returns 201 when a new user is signed up", async () => {
