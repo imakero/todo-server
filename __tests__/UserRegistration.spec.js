@@ -6,10 +6,10 @@ const {
   dropDatabase,
   disconnectDatabase,
 } = require("../lib/database")
+const User = require("../models/user")
 
 const validUser = {
   username: "cartman",
-  email: "eric_cartman@gmail.com",
   password: "I/1o61n63r5",
 }
 
@@ -36,4 +36,59 @@ describe("User registration", () => {
     const response = await postUser()
     expect(response.statusCode).toBe(201)
   })
+
+  it("Returns 'User created' when new user is signed up", async () => {
+    const response = await postUser()
+    expect(response.body.message).toBe("User created")
+  })
+
+  it("Saves the new user to the database", async () => {
+    await postUser()
+    const userList = await User.find()
+    expect(userList.length).toBe(1)
+  })
+
+  it("Saves username to the database", async () => {
+    await postUser(validUser)
+    const user = await User.findOne()
+    expect(user.username).toBe(validUser.username)
+  })
+
+  it("Hashed the password before saving it in the database", async () => {
+    await postUser()
+    const user = await User.findOne()
+    expect(user.password).not.toBe(validUser.password)
+  })
+
+  it("Returns 400 when no username is provided", async () => {
+    const response = await postUser({ ...validUser, username: undefined })
+    expect(response.status).toBe(400)
+  })
+
+  it("Returns validationErrors field on response body when validation fails", async () => {
+    const response = await postUser({ ...validUser, username: undefined })
+    expect(response.body.validationErrors).not.toBeUndefined()
+  })
+
+  const username_undefined = "Username is required"
+  const username_length = "Username must be between 4 and 32 characters long"
+  const password_undefined = "Password is required"
+  const password_length = "Password must be at least 8 characters long"
+
+  it.each`
+    field         | value             | expectedMessage
+    ${"username"} | ${undefined}      | ${username_undefined}
+    ${"username"} | ${"spr"}          | ${username_length}
+    ${"username"} | ${"a".repeat(33)} | ${username_length}
+    ${"password"} | ${undefined}      | ${password_undefined}
+    ${"password"} | ${"secretp"}      | ${password_length}
+  `(
+    "Returns '$expectedMessage' when $field is $value",
+    async ({ field, value, expectedMessage }) => {
+      const user = { ...validUser, [field]: value }
+      const response = await postUser(user)
+      const body = response.body
+      expect(body.validationErrors[field]).toBe(expectedMessage)
+    }
+  )
 })
