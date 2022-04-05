@@ -4,6 +4,7 @@ const {
   connectDatabase,
   clearDatabase,
   dropDatabase,
+  disconnectDatabase,
 } = require("../lib/database")
 
 const validUser = {
@@ -27,6 +28,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await dropDatabase()
+  await disconnectDatabase()
 })
 
 describe("User registration", () => {
