@@ -1,16 +1,10 @@
 const express = require("express")
-const userValidation = require("./middleware/validation/userValidation")
-const { createUser } = require("./models/userServices")
+const usersRouter = require("./routers/users")
 
 const app = express()
 
 app.use(express.json())
 
-app.post("/api/1.0/users", userValidation, async (req, res) => {
-  const { username, password } = req.body
-  await createUser(username, password)
-  res.statusCode = 201
-  res.json({ message: "User created" })
-})
+app.use("/api/1.0/users", usersRouter)
 
 module.exports = app
