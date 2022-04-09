@@ -1,3 +1,5 @@
+const { ValidationError } = require("../errors/CustomError")
+
 const validationMiddleware = (fieldsToValidate) => async (req, res, next) => {
   try {
     await Promise.all(
@@ -6,8 +8,7 @@ const validationMiddleware = (fieldsToValidate) => async (req, res, next) => {
       )
     )
   } catch (error) {
-    res.statusCode = 400
-    return res.json({ validationErrors: getErrorResponse(error) })
+    next(new ValidationError({ validationErrors: getErrorResponse(error) }))
   }
   next()
 }

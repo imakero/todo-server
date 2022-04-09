@@ -65,15 +65,15 @@ describe("User registration", () => {
     expect(response.status).toBe(400)
   })
 
-  it("Returns validationErrors field on response body when validation fails", async () => {
+  it("Returns validationErrors field on error response body when validation fails", async () => {
     const response = await postUser({ ...validUser, username: undefined })
-    expect(response.body.validationErrors).not.toBeUndefined()
+    expect(response.body.error.data.validationErrors).not.toBeUndefined()
   })
 
-  const username_undefined = "Username is required"
-  const username_length = "Username must be between 4 and 32 characters long"
-  const password_undefined = "Password is required"
-  const password_length = "Password must be at least 8 characters long"
+  const username_undefined = "Username is required."
+  const username_length = "Username must be between 4 and 32 characters long."
+  const password_undefined = "Password is required."
+  const password_length = "Password must be at least 8 characters long."
 
   it.each`
     field         | value             | expectedMessage
@@ -83,12 +83,14 @@ describe("User registration", () => {
     ${"password"} | ${undefined}      | ${password_undefined}
     ${"password"} | ${"secretp"}      | ${password_length}
   `(
-    "Returns '$expectedMessage' when $field is $value",
+    "Returns a ValidationError with data {$field: '$expectedMessage'} when $field is $value",
     async ({ field, value, expectedMessage }) => {
       const user = { ...validUser, [field]: value }
       const response = await postUser(user)
-      const body = response.body
-      expect(body.validationErrors[field]).toBe(expectedMessage)
+      const { error } = response.body
+      expect(error.data.validationErrors[field]).toBe(expectedMessage)
+      expect(error.name).toBe("ValidationError")
+      expect(error.status).toBe(400)
     }
   )
 })
