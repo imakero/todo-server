@@ -13,4 +13,10 @@ class ValidationError extends CustomError {
   }
 }
 
-module.exports = { CustomError, ValidationError }
+class UniqueError extends CustomError {
+  constructor(message, key, value) {
+    super("UniqueError", message, 409, { key, value })
+  }
+}
+
+module.exports = { CustomError, ValidationError, UniqueError }

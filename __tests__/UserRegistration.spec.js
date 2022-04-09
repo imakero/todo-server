@@ -93,4 +93,18 @@ describe("User registration", () => {
       expect(error.status).toBe(400)
     }
   )
+
+  it("Returns UniqueError when the user already exists", async () => {
+    await postUser()
+    const response = await postUser()
+    const { error } = response.body
+    expect(response.status).toBe(409)
+    expect(error.name).toBe("UniqueError")
+    expect(error.message).toBe(
+      `The username '${validUser.username}' is already in use.`
+    )
+    expect(error.status).toBe(409)
+    expect(error.data.key).toBe("username")
+    expect(error.data.value).toBe(validUser.username)
+  })
 })
