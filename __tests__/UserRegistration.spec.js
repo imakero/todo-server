@@ -1,35 +1,9 @@
 const request = require("supertest")
 const app = require("../app")
-const {
-  connectDatabase,
-  clearDatabase,
-  dropDatabase,
-  disconnectDatabase,
-} = require("../lib/database")
+const { setupDatabase, postUser, validUser } = require("../lib/test-utils")
 const User = require("../models/user")
 
-const validUser = {
-  username: "cartman",
-  password: "I/1o61n63r5",
-}
-
-const postUser = (user = validUser, options = {}) => {
-  const agent = request(app).post("/api/1.0/users")
-  return agent.send(user)
-}
-
-beforeAll(async () => {
-  await connectDatabase()
-})
-
-beforeEach(async () => {
-  await clearDatabase()
-})
-
-afterAll(async () => {
-  await dropDatabase()
-  await disconnectDatabase()
-})
+setupDatabase()
 
 describe("User registration", () => {
   it("Returns 201 when a new user is signed up", async () => {
