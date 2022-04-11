@@ -2,6 +2,8 @@ const { CustomError } = require("../errors/CustomError")
 const { pick } = require("../lib/helpers")
 
 const errorHandler = (err, _req, res, _next) => {
+  //console.error(err)
+
   const clientError =
     err instanceof CustomError
       ? pick(err, ["name", "message", "status", "data"])
@@ -12,6 +14,7 @@ const errorHandler = (err, _req, res, _next) => {
           status: 500,
           data: {},
         }
+
   res.status(clientError.status).send({ error: clientError })
 }
 
