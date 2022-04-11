@@ -1,6 +1,5 @@
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
-const { pick } = require("../lib/helpers")
 const { IncorrectCredentialsError } = require("../errors/CustomError")
 
 const userSchema = new mongoose.Schema({
