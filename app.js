@@ -1,17 +1,18 @@
 const express = require("express")
-const userValidation = require("./middleware/validation/userValidation")
-const User = require("./models/user")
+const { databaseErrors } = require("./middleware/databaseErrors")
+const { errorHandler } = require("./middleware/errorHandler")
+const usersRouter = require("./routers/users")
+const authRouter = require("./routers/auth")
+require("dotenv").config()
 
 const app = express()
 
 app.use(express.json())
 
-app.post("/api/1.0/users", userValidation, async (req, res) => {
-  const { username, password } = req.body
-  const user = new User({ username, password })
-  await user.save()
-  res.statusCode = 201
-  res.json({ message: "User created" })
-})
+app.use("/api/1.0/users", usersRouter)
+app.use("/api/1.0/auth", authRouter)
+
+app.use(databaseErrors)
+app.use(errorHandler)
 
 module.exports = app

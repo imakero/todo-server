@@ -1,25 +1,18 @@
-const userSchema = require("../../models/userValidation")
+const { object, string } = require("yup")
+const validationMiddleware = require("../validationMiddleware")
 
-const userValidation = async (req, res, next) => {
-  try {
-    const user = await userSchema.validate(req.body, { abortEarly: false })
-  } catch (error) {
-    res.statusCode = 400
-    return res.json({ validationErrors: getErrorResponse(error) })
-  }
-  next()
-}
+const bodySchema = object({
+  username: string()
+    .required("Username is required.")
+    .min(4, "Username must be between 4 and 32 characters long.")
+    .max(32, "Username must be between 4 and 32 characters long."),
+  password: string()
+    .required("Password is required.")
+    .min(8, "Password must be at least 8 characters long."),
+})
 
-const getErrorResponse = (errors) => {
-  if (errors.inner && errors.inner.length > 0) {
-    return errors.inner.reduce(
-      (validationErrors, error) =>
-        Object.assign(validationErrors, getErrorResponse(error)),
-      {}
-    )
-  } else {
-    return { [errors.path]: errors.message }
-  }
-}
+const userValidation = validationMiddleware([
+  { name: "body", schema: bodySchema },
+])
 
 module.exports = userValidation
