@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test jest --watchAll",
+    "test": "NODE_ENV=test jest --watchAll --runInBand",
     "start": "NODE_ENV=development nodemon index.js"
   },
   "keywords": [],
@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.2.8",
     "yup": "^0.32.11"
   }

@@ -1,9 +1,10 @@
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
+const { pick } = require("../lib/helpers")
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true, lowercase: true },
-  password: { type: String, required: true },
+  password: { type: String, required: true, select: false },
 })
 
 userSchema.pre("save", async function (next) {
@@ -12,6 +13,15 @@ userSchema.pre("save", async function (next) {
   }
   next()
 })
+
+userSchema.statics.login = async function (username, password) {
+  const user = await this.findOne({ username }).select("+password")
+  if (user && (await bcrypt.compare(password, user.password))) {
+    return user
+  } else {
+    return null
+  }
+}
 
 const User = mongoose.model("User", userSchema)
 
