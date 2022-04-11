@@ -19,4 +19,19 @@ class UniqueError extends CustomError {
   }
 }
 
-module.exports = { CustomError, ValidationError, UniqueError }
+class IncorrectCredentialsError extends CustomError {
+  constructor() {
+    super(
+      "IncorrectCredentialsError",
+      "Incorrect username and/or password",
+      401
+    )
+  }
+}
+
+module.exports = {
+  CustomError,
+  ValidationError,
+  UniqueError,
+  IncorrectCredentialsError,
+}
