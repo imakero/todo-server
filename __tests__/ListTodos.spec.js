@@ -77,4 +77,11 @@ describe("List todos", () => {
     expect(todosCreationTime[2]).toBeGreaterThanOrEqual(todosCreationTime[3])
     expect(todosCreationTime[3]).toBeGreaterThanOrEqual(todosCreationTime[4])
   })
+
+  it("Returns todos with an author field containing the username", async () => {
+    await postTodo()
+    const response = await getTodos()
+    const todo = response.body.todos[0]
+    expect(todo.author.username).toBe(validUser.username)
+  })
 })
