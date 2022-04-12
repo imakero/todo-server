@@ -5,4 +5,10 @@ const createTodo = (todo) => {
   return todoToSave.save()
 }
 
-module.exports = { createTodo }
+const getTodos = (userId) => {
+  return Todo.find({ author: userId })
+    .sort({ createdAt: -1 })
+    .populate("author")
+}
+
+module.exports = { createTodo, getTodos }
