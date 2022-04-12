@@ -5,4 +5,8 @@ const createTodo = (todo) => {
   return todoToSave.save()
 }
 
-module.exports = { createTodo }
+const getTodos = (userId) => {
+  return Todo.find({ author: userId })
+}
+
+module.exports = { createTodo, getTodos }
