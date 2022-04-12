@@ -1,3 +1,4 @@
+const { getAuthHeader } = require("../lib/auth")
 const {
   setupDatabase,
   postTodo: postTodoBase,
@@ -10,10 +11,6 @@ const Todo = require("../models/todo")
 setupDatabase()
 
 describe("Todo creation", () => {
-  const getAuthHeaders = (token) => ({
-    Authorization: `Bearer ${token}`,
-  })
-
   let postTodo
   let authorizedUser
   const options = {}
@@ -22,7 +19,7 @@ describe("Todo creation", () => {
     await postUser()
     const response = await login()
     authorizedUser = response.body
-    const headers = getAuthHeaders(response.body.token)
+    const headers = getAuthHeader(response.body.token)
     options.headers = headers
     postTodo = (todo = validTodo, requestOptions = options) =>
       postTodoBase(todo, requestOptions)
