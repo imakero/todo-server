@@ -1,5 +1,3 @@
-const request = require("supertest")
-const app = require("../app")
 const { setupDatabase, postUser, validUser } = require("../lib/test-utils")
 const User = require("../models/user")
 

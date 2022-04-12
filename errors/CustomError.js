@@ -29,9 +29,27 @@ class IncorrectCredentialsError extends CustomError {
   }
 }
 
+class InvalidTokenError extends CustomError {
+  constructor() {
+    super("InvalidTokenError", "The provided token is not valid.", 401)
+  }
+}
+
+class UnauthorizedError extends CustomError {
+  constructor() {
+    super(
+      "UnauthorizedError",
+      "Unauthorized, please provide a valid token.",
+      401
+    )
+  }
+}
+
 module.exports = {
   CustomError,
   ValidationError,
   UniqueError,
   IncorrectCredentialsError,
+  InvalidTokenError,
+  UnauthorizedError,
 }
