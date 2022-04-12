@@ -6,7 +6,7 @@ const createTodo = (todo) => {
 }
 
 const getTodos = (userId) => {
-  return Todo.find({ author: userId })
+  return Todo.find({ author: userId }).sort({ createdAt: -1 })
 }
 
 module.exports = { createTodo, getTodos }
