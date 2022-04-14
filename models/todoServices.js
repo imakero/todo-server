@@ -6,10 +6,8 @@ const createTodo = (todo) => {
   return todoToSave.save()
 }
 
-const getTodos = (userId) => {
-  return Todo.find({ author: userId })
-    .sort({ createdAt: -1 })
-    .populate("author")
+const getTodos = (filters) => {
+  return Todo.find(filters).sort({ createdAt: -1 }).populate("author")
 }
 
 const setTodoCompleted = async (todoId, completed) => {

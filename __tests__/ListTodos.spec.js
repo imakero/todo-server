@@ -8,6 +8,7 @@ const {
   getTodos: getTodosBase,
   validUser,
 } = require("../lib/test-utils")
+const Todo = require("../models/todo")
 
 setupDatabase()
 
@@ -83,5 +84,55 @@ describe("List todos", () => {
     const response = await getTodos()
     const todo = response.body.todos[0]
     expect(todo.author.username).toBe(validUser.username)
+  })
+
+  describe("Filtering on completed", () => {
+    beforeEach(async () => {
+      await postTodo()
+      await Todo.findOneAndUpdate({}, { completed: true })
+      await saveMultiple(3, { sleep: 5 })
+    })
+
+    it("Returns only incomplete todos when the query string is 'completed=false'", async () => {
+      const response = await getTodos({
+        headers: options.headers,
+        query: "completed=false",
+      })
+      expect(response.body.todos.length).toBe(3)
+    })
+
+    it("Returns only completed todos when the query string is 'completed=true'", async () => {
+      const response = await getTodos({
+        headers: options.headers,
+        query: "completed=true",
+      })
+      expect(response.body.todos.length).toBe(1)
+    })
+
+    it("Returns the todos sorted by creation date, newest first", async () => {
+      const response = await getTodos({
+        headers: options.headers,
+        query: "completed=false",
+      })
+      const todosCreationTime = response.body.todos.map((todo) =>
+        new Date(todo.createdAt).getTime()
+      )
+      expect(todosCreationTime[0]).toBeGreaterThanOrEqual(todosCreationTime[1])
+      expect(todosCreationTime[1]).toBeGreaterThanOrEqual(todosCreationTime[2])
+    })
+
+    it("Returns ValidationError when the query string is 'completed=hello'", async () => {
+      const response = await getTodos({
+        headers: options.headers,
+        query: "completed=hello",
+      })
+      expect(response.status).toBe(400)
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.name).toBe("ValidationError")
+      expect(response.body.error.message).toBe("There were validation errors.")
+      expect(response.body.error.data.validationErrors.completed).toBe(
+        "The value for completed must be either true or false."
+      )
+    })
   })
 })
