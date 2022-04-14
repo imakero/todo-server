@@ -1,8 +1,13 @@
 const { Router } = require("express")
 const { catchErrors } = require("../errors/catchErrors")
 const { pick } = require("../lib/helpers")
+const todoQueryValidation = require("../middleware/validation/todoQueryValidation")
 const todoValidation = require("../middleware/validation/todoValidation")
-const { createTodo, getTodos } = require("../models/todoServices")
+const {
+  createTodo,
+  getTodos,
+  setTodoCompleted,
+} = require("../models/todoServices")
 
 const router = Router()
 
@@ -19,9 +24,31 @@ router.post(
 
 router.get(
   "/",
+  todoQueryValidation,
   catchErrors(async (req, res) => {
-    const todos = await getTodos(req.user.userId)
+    const filters = { author: req.user.userId }
+    const { completed } = req.query
+    if (completed !== undefined) {
+      filters.completed = completed
+    }
+    const todos = await getTodos(filters)
     res.status(200).send({ todos })
+  })
+)
+
+router.post(
+  "/:todoId/complete",
+  catchErrors(async (req, res) => {
+    const todo = await setTodoCompleted(req.params.todoId, true)
+    res.status(200).send({ todo, message: "Todo completed" })
+  })
+)
+
+router.delete(
+  "/:todoId/complete",
+  catchErrors(async (req, res) => {
+    const todo = await setTodoCompleted(req.params.todoId, false)
+    res.status(200).send({ message: "Todo reset", todo })
   })
 )
 

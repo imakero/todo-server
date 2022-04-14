@@ -45,6 +45,12 @@ class UnauthorizedError extends CustomError {
   }
 }
 
+class NotFoundError extends CustomError {
+  constructor(message) {
+    super("NotFoundError", message, 404)
+  }
+}
+
 module.exports = {
   CustomError,
   ValidationError,
@@ -52,4 +58,5 @@ module.exports = {
   IncorrectCredentialsError,
   InvalidTokenError,
   UnauthorizedError,
+  NotFoundError,
 }
