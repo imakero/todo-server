@@ -50,9 +50,11 @@ describe("User registration", () => {
   it.each`
     field         | value             | expectedMessage
     ${"username"} | ${undefined}      | ${username_undefined}
+    ${"username"} | ${""}             | ${username_undefined}
     ${"username"} | ${"spr"}          | ${username_length}
     ${"username"} | ${"a".repeat(33)} | ${username_length}
     ${"password"} | ${undefined}      | ${password_undefined}
+    ${"password"} | ${""}             | ${password_undefined}
     ${"password"} | ${"secretp"}      | ${password_length}
   `(
     "Returns a ValidationError with data {$field: '$expectedMessage'} when $field is $value",
