@@ -1,4 +1,5 @@
 const express = require("express")
+const cors = require("cors")
 const { databaseErrors } = require("./middleware/databaseErrors")
 const { errorHandler } = require("./middleware/errorHandler")
 const usersRouter = require("./routers/users")
@@ -9,6 +10,7 @@ require("dotenv").config()
 
 const app = express()
 
+app.use(cors({ origin: "http://localhost:3001" }))
 app.use(express.json())
 
 app.use("/api/1.0/users", usersRouter)
