@@ -2,7 +2,9 @@ const { CustomError } = require("../errors/CustomError")
 const { pick } = require("../lib/helpers")
 
 const errorHandler = (err, _req, res, _next) => {
-  //console.error(err)
+  if (process.env.NODE_ENV !== "test") {
+    console.error(err)
+  }
 
   const clientError =
     err instanceof CustomError
