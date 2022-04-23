@@ -36,12 +36,8 @@ class InvalidTokenError extends CustomError {
 }
 
 class UnauthorizedError extends CustomError {
-  constructor() {
-    super(
-      "UnauthorizedError",
-      "Unauthorized, please provide a valid token.",
-      401
-    )
+  constructor(message = "Unauthorized, please provide a valid token.") {
+    super("UnauthorizedError", message, 401)
   }
 }
 

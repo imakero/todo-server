@@ -8,7 +8,7 @@ const bodySchema = object({
     .max(1000, "The todo's title must be less than 1000 characters long"),
   content: string().max(
     10000,
-    "The todo's content must be less than 1000 characters long"
+    "The todo's content must be less than 10000 characters long"
   ),
 })
 
