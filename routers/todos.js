@@ -1,4 +1,6 @@
 const { Router } = require("express")
+const multer = require("multer")
+const fs = require("fs")
 const { catchErrors } = require("../errors/catchErrors")
 const { pick } = require("../lib/helpers")
 const todoQueryValidation = require("../middleware/validation/todoQueryValidation")
@@ -7,7 +9,24 @@ const {
   createTodo,
   getTodos,
   setTodoCompleted,
+  updateTodo,
+  addTodoAttachment,
+  removeTodoAttachment,
 } = require("../models/todoServices")
+const { createAttachment } = require("../models/attachmentServices")
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const path = `./uploads/${req.params.todoId}`
+      fs.mkdirSync(path, { recursive: true })
+      cb(null, path)
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.originalname)
+    },
+  }),
+})
 
 const router = Router()
 
@@ -22,6 +41,17 @@ router.post(
   })
 )
 
+router.put(
+  "/:todoId",
+  todoValidation,
+  catchErrors(async (req, res) => {
+    const fieldsToUpdate = pick(req.body, ["title", "content"])
+    const { todoId } = req.params
+    const updatedTodo = await updateTodo(todoId, fieldsToUpdate)
+    res.status(200).send({ message: "Todo updated", todo: updatedTodo })
+  })
+)
+
 router.get(
   "/",
   todoQueryValidation,
@@ -31,8 +61,29 @@ router.get(
     if (completed !== undefined) {
       filters.completed = completed
     }
-    const todos = await getTodos(filters)
+    const todos = await getTodos(filters).populate("attachments")
     res.status(200).send({ todos })
+  })
+)
+
+router.put(
+  "/:todoId/attachments",
+  upload.single("attachment"),
+  catchErrors(async (req, res) => {
+    let attachment = await createAttachment(req.file, req.user.userId)
+    await addTodoAttachment(req.params.todoId, attachment._id)
+    res
+      .status(200)
+      .send({ message: "Attachment created and added to todo.", attachment })
+  })
+)
+
+router.delete(
+  "/:todoId/attachments/:attachmentId",
+  catchErrors(async (req, res) => {
+    const { todoId, attachmentId } = req.params
+    await removeTodoAttachment(todoId, attachmentId)
+    res.sendStatus(204)
   })
 )
 
