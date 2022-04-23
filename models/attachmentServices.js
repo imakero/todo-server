@@ -1,10 +1,14 @@
 const { UniqueError } = require("../errors/CustomError")
 const Attachment = require("./attachment")
 
-const createAttachment = async (file) => {
+const createAttachment = async (file, author) => {
   try {
     const { path, filename } = file
-    const attachmentToSave = new Attachment({ path, filename })
+    const attachmentToSave = new Attachment({
+      path,
+      filename,
+      author,
+    })
     await attachmentToSave.save()
     return attachmentToSave
   } catch (error) {
@@ -18,4 +22,8 @@ const createAttachment = async (file) => {
   }
 }
 
-module.exports = { createAttachment }
+const getAttachment = async (attachmentId, userId) => {
+  return await Attachment.findOne({ _id: attachmentId, author: userId })
+}
+
+module.exports = { getAttachment, createAttachment }

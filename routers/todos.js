@@ -61,7 +61,7 @@ router.get(
     if (completed !== undefined) {
       filters.completed = completed
     }
-    const todos = await getTodos(filters)
+    const todos = await getTodos(filters).populate("attachments")
     res.status(200).send({ todos })
   })
 )
@@ -70,7 +70,7 @@ router.put(
   "/:todoId/attachments",
   upload.single("attachment"),
   catchErrors(async (req, res) => {
-    let attachment = await createAttachment(req.file)
+    let attachment = await createAttachment(req.file, req.user.userId)
     await addTodoAttachment(req.params.todoId, attachment._id)
     res
       .status(200)

@@ -14,6 +14,10 @@ const getTodos = (filters) => {
   return Todo.find(filters).sort({ createdAt: -1 }).populate("author")
 }
 
+const getTodo = (todoId) => {
+  return Todo.findById(todoId)
+}
+
 const updateTodo = async (todoId, fieldsToUpdate) => {
   const updatedTodo = await Todo.findOneAndUpdate(
     { _id: todoId },
@@ -66,6 +70,7 @@ const setTodoCompleted = async (todoId, completed) => {
 module.exports = {
   createTodo,
   getTodos,
+  getTodo,
   updateTodo,
   setTodoCompleted,
   addTodoAttachment,
