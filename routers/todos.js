@@ -17,6 +17,7 @@ const {
 } = require("../models/todoServices")
 const { createAttachment } = require("../models/attachmentServices")
 const tagValidation = require("../middleware/validation/tagValidation")
+const { getTagIds } = require("../models/tagServices")
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -60,9 +61,12 @@ router.get(
   todoQueryValidation,
   catchErrors(async (req, res) => {
     const filters = { author: req.user.userId }
-    const { completed } = req.query
+    const { completed, tags } = req.query
     if (completed !== undefined) {
       filters.completed = completed
+    }
+    if (tags !== undefined) {
+      filters.tags = { $in: await getTagIds(tags) }
     }
     const todos = await getTodos(filters).populate(["attachments", "tags"])
     res.status(200).send({ todos })
