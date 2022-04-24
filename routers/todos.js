@@ -12,8 +12,11 @@ const {
   updateTodo,
   addTodoAttachment,
   removeTodoAttachment,
+  addTag,
+  removeTag,
 } = require("../models/todoServices")
 const { createAttachment } = require("../models/attachmentServices")
+const tagValidation = require("../middleware/validation/tagValidation")
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -61,7 +64,7 @@ router.get(
     if (completed !== undefined) {
       filters.completed = completed
     }
-    const todos = await getTodos(filters).populate("attachments")
+    const todos = await getTodos(filters).populate(["attachments", "tags"])
     res.status(200).send({ todos })
   })
 )
@@ -100,6 +103,23 @@ router.delete(
   catchErrors(async (req, res) => {
     const todo = await setTodoCompleted(req.params.todoId, false)
     res.status(200).send({ message: "Todo reset", todo })
+  })
+)
+
+router.put(
+  "/:todoId/tags",
+  tagValidation,
+  catchErrors(async (req, res) => {
+    const tag = await addTag(req.params.todoId, req.body.text)
+    res.status(200).send({ message: "Tag added", tag })
+  })
+)
+
+router.delete(
+  "/:todoId/tags/:tagId",
+  catchErrors(async (req, res) => {
+    await removeTag(req.params.todoId, req.params.tagId)
+    res.sendStatus(204)
   })
 )
 

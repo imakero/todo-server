@@ -4,6 +4,7 @@ const path = require("path")
 const { NotFoundError } = require("../errors/CustomError")
 const Todo = require("../models/todo")
 const Attachment = require("./attachment")
+const Tag = require("./tag")
 
 const createTodo = (todo) => {
   const todoToSave = new Todo(todo)
@@ -67,6 +68,31 @@ const setTodoCompleted = async (todoId, completed) => {
   }
 }
 
+const addTag = async (todoId, text) => {
+  const savedTag = await Tag.findOneAndUpdate(
+    { text },
+    { $set: { text } },
+    { upsert: true, returnDocument: "after" }
+  )
+  await Todo.findOneAndUpdate(
+    {
+      _id: todoId,
+    },
+    { $addToSet: { tags: mongoose.Types.ObjectId(savedTag._id) } },
+    { returnDocument: "after" }
+  )
+  return savedTag
+}
+
+const removeTag = async (todoId, tagId) => {
+  await Todo.updateOne(
+    {
+      _id: todoId,
+    },
+    { $pull: { tags: mongoose.Types.ObjectId(tagId) } }
+  )
+}
+
 module.exports = {
   createTodo,
   getTodos,
@@ -75,4 +101,6 @@ module.exports = {
   setTodoCompleted,
   addTodoAttachment,
   removeTodoAttachment,
+  addTag,
+  removeTag,
 }
